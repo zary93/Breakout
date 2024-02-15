@@ -5,11 +5,13 @@ from paddle import Paddle
 from ball import Ball
 from score import Score
 
+# Initialize the game screen
 screen = Screen()
 screen.bgcolor('black')
 screen.setup(width=700, height=500)
 screen.title("BreakOut")
 
+# Create paddle, ball, and score objects
 paddle = Paddle()
 ball = Ball()
 the_wall = []
@@ -18,7 +20,14 @@ game_is_on = True
 row = 1
 
 
-def row_wall(rows):  # Create the wall with how many rows u want
+# Function to create a row of bricks on the wall
+def row_wall(rows):
+    """
+        Create the wall with the specified number of rows.
+
+        Parameters:
+        - rows: Number of rows in the wall
+        """
     x_initial = -320
     y_position = 55
     for x in range(rows):
@@ -38,17 +47,21 @@ def row_wall(rows):  # Create the wall with how many rows u want
         y_position += 30
 
 
+# Initialize the initial wall of bricks
 row_wall(row)
 
+# Set up event listeners for paddle movement
 screen.listen()
-
 screen.onkey(paddle.go_right, "Right")
 screen.onkey(paddle.go_left, "Left")
-while game_is_on:
 
+# Main game loop
+while game_is_on:
+    # Move the ball and update the screen
     time.sleep(ball.ball_move)
     ball.move_ball()
     screen.update()
+    # Check for collisions with bricks
     for brick in the_wall:
         if ball.distance(brick) < 30:
             ball.bounce_y()
@@ -56,16 +69,22 @@ while game_is_on:
             brick.hideturtle()
             the_wall.remove(brick)
             score.update_score()
+
+            # Check if all bricks are cleared
             if not the_wall:
                 row += 1
                 if row > 5:
                     game_is_on = False
                     score.update_bestscore()
                     messagebox.showinfo("Congratulation", "Great Job! You finish the game!")
+
+                # Reset paddle and ball, speed up the ball, and create a new row of bricks
                 paddle.goto(0, -230)
                 ball.reset_ball()
                 ball.ball_move *= 0.9
                 row_wall(row)
+
+    # Check for collisions with paddle, walls, and game over
     if ball.distance(paddle) < 30 and ball.ycor() > -230:
         ball.bounce_y()
     elif ball.xcor() > 330 or ball.xcor() < -330:
